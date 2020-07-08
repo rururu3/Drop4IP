@@ -1,0 +1,2 @@
+chainName: Drop4IP
+dns: sqlite:./storage/database.sqlite3

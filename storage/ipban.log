@@ -1,0 +1,129 @@
+DEBUG - /sbin/iptables -D INPUT -j Drop4IP
+DEBUG - /sbin/iptables -F Drop4IP
+DEBUG - /sbin/iptables -X Drop4IP
+DEBUG - /sbin/ip6tables -D INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -F Drop4IP
+DEBUG - /sbin/ip6tables -X Drop4IP
+DEBUG - /sbin/iptables -N Drop4IP
+DEBUG - /sbin/iptables -A Drop4IP -j RETURN
+DEBUG - /sbin/iptables -I INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -N Drop4IP
+DEBUG - /sbin/ip6tables -A Drop4IP -j RETURN
+DEBUG - /sbin/ip6tables -I INPUT -j Drop4IP
+DEBUG - /sbin/iptables -I Drop4IP --source 74.125.83.66 --proto tcp --dport 80 --jump DROP
+DEBUG - run
+DEBUG - IN_OPEN
+DEBUG - /sbin/iptables -D INPUT -j Drop4IP
+DEBUG - /sbin/iptables -F Drop4IP
+DEBUG - /sbin/iptables -X Drop4IP
+DEBUG - /sbin/ip6tables -D INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -F Drop4IP
+DEBUG - /sbin/ip6tables -X Drop4IP
+DEBUG - /sbin/iptables -N Drop4IP
+DEBUG - /sbin/iptables -A Drop4IP -j RETURN
+DEBUG - /sbin/iptables -I INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -N Drop4IP
+DEBUG - /sbin/ip6tables -A Drop4IP -j RETURN
+DEBUG - /sbin/ip6tables -I INPUT -j Drop4IP
+DEBUG - /sbin/iptables -I Drop4IP --source 74.125.83.66 --proto tcp --dport 80 --jump DROP
+DEBUG - run
+DEBUG - IN_OPEN
+DEBUG - /sbin/iptables -D INPUT -j Drop4IP
+DEBUG - /sbin/iptables -F Drop4IP
+DEBUG - /sbin/iptables -X Drop4IP
+DEBUG - /sbin/ip6tables -D INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -F Drop4IP
+DEBUG - /sbin/ip6tables -X Drop4IP
+DEBUG - /sbin/iptables -N Drop4IP
+DEBUG - /sbin/iptables -A Drop4IP -j RETURN
+DEBUG - /sbin/iptables -I INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -N Drop4IP
+DEBUG - /sbin/ip6tables -A Drop4IP -j RETURN
+DEBUG - /sbin/ip6tables -I INPUT -j Drop4IP
+DEBUG - run
+DEBUG - IN_OPEN
+DEBUG - /sbin/iptables -D INPUT -j Drop4IP
+DEBUG - /sbin/iptables -F Drop4IP
+DEBUG - /sbin/iptables -X Drop4IP
+DEBUG - /sbin/ip6tables -D INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -F Drop4IP
+DEBUG - /sbin/ip6tables -X Drop4IP
+DEBUG - /sbin/iptables -N Drop4IP
+DEBUG - /sbin/iptables -A Drop4IP -j RETURN
+DEBUG - /sbin/iptables -I INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -N Drop4IP
+DEBUG - /sbin/ip6tables -A Drop4IP -j RETURN
+DEBUG - /sbin/ip6tables -I INPUT -j Drop4IP
+DEBUG - /sbin/iptables -I Drop4IP --source 74.125.83.66 --proto tcp --dport 80 --jump DROP
+DEBUG - run
+DEBUG - IN_OPEN
+DEBUG - /sbin/iptables -D INPUT -j Drop4IP
+DEBUG - /sbin/iptables -F Drop4IP
+DEBUG - /sbin/iptables -X Drop4IP
+DEBUG - /sbin/ip6tables -D INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -F Drop4IP
+DEBUG - /sbin/ip6tables -X Drop4IP
+DEBUG - /sbin/iptables -N Drop4IP
+DEBUG - /sbin/iptables -A Drop4IP -j RETURN
+DEBUG - /sbin/iptables -I INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -N Drop4IP
+DEBUG - /sbin/ip6tables -A Drop4IP -j RETURN
+DEBUG - /sbin/ip6tables -I INPUT -j Drop4IP
+DEBUG - run
+DEBUG - IN_OPEN
+DEBUG - /sbin/iptables -D INPUT -j Drop4IP
+DEBUG - /sbin/iptables -F Drop4IP
+DEBUG - /sbin/iptables -X Drop4IP
+DEBUG - /sbin/ip6tables -D INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -F Drop4IP
+DEBUG - /sbin/ip6tables -X Drop4IP
+DEBUG - /sbin/iptables -N Drop4IP
+DEBUG - /sbin/iptables -A Drop4IP -j RETURN
+DEBUG - /sbin/iptables -I INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -N Drop4IP
+DEBUG - /sbin/ip6tables -A Drop4IP -j RETURN
+DEBUG - /sbin/ip6tables -I INPUT -j Drop4IP
+DEBUG - /sbin/iptables -I Drop4IP --source 74.125.83.66 --proto tcp --dport 80 --jump DROP
+DEBUG - /sbin/iptables -D INPUT -j Drop4IP
+DEBUG - /sbin/iptables -F Drop4IP
+DEBUG - /sbin/iptables -X Drop4IP
+DEBUG - /sbin/ip6tables -D INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -F Drop4IP
+DEBUG - /sbin/ip6tables -X Drop4IP
+DEBUG - /sbin/iptables -N Drop4IP
+DEBUG - /sbin/iptables -A Drop4IP -j RETURN
+DEBUG - /sbin/iptables -I INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -N Drop4IP
+DEBUG - /sbin/ip6tables -A Drop4IP -j RETURN
+DEBUG - /sbin/ip6tables -I INPUT -j Drop4IP
+DEBUG - /sbin/iptables -I Drop4IP --source 74.125.83.66 --proto tcp --dport 80 --jump DROP
+DEBUG - run
+DEBUG - IN_OPEN
+DEBUG - /sbin/iptables -D Drop4IP --source 74.125.83.66 --proto tcp --dport 80 --jump DROP
+DEBUG - /sbin/iptables -D INPUT -j Drop4IP
+DEBUG - /sbin/iptables -F Drop4IP
+DEBUG - /sbin/iptables -X Drop4IP
+DEBUG - /sbin/ip6tables -D INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -F Drop4IP
+DEBUG - /sbin/ip6tables -X Drop4IP
+DEBUG - /sbin/iptables -N Drop4IP
+DEBUG - /sbin/iptables -A Drop4IP -j RETURN
+DEBUG - /sbin/iptables -I INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -N Drop4IP
+DEBUG - /sbin/ip6tables -A Drop4IP -j RETURN
+DEBUG - /sbin/ip6tables -I INPUT -j Drop4IP
+DEBUG - run
+DEBUG - /sbin/iptables -D INPUT -j Drop4IP
+DEBUG - /sbin/iptables -F Drop4IP
+DEBUG - /sbin/iptables -X Drop4IP
+DEBUG - /sbin/ip6tables -D INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -F Drop4IP
+DEBUG - /sbin/ip6tables -X Drop4IP
+DEBUG - /sbin/iptables -N Drop4IP
+DEBUG - /sbin/iptables -A Drop4IP -j RETURN
+DEBUG - /sbin/iptables -I INPUT -j Drop4IP
+DEBUG - /sbin/ip6tables -N Drop4IP
+DEBUG - /sbin/ip6tables -A Drop4IP -j RETURN
+DEBUG - /sbin/ip6tables -I INPUT -j Drop4IP
+DEBUG - run
+DEBUG - IN_OPEN

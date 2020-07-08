@@ -1,0 +1,11 @@
+service: test-error
+logs:
+  - ./storage/logtest.log
+protocols:
+  - tcp
+ports:
+  - 80
+rules:
+  - DROP
+regexes:
+  - '/postfix\/smtpd\[.*\]: .* reject: RCPT from .*\[(.*)\]: 554 /'

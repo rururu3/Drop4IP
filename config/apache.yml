@@ -1,0 +1,21 @@
+service: apache-error
+logs:
+  - /var/log/httpd/error_log
+protocols:
+  - tcp
+ports:
+  - 80
+rules:
+  - DROP
+regexes:
+  - '/error\] \[client (.*)\] .* authentication failure/'
+  - '/error\] \[client (.*)\] client /'
+  - '/error\] \[client (.*)\] client denied/'
+  - '/error\] \[client (.*)\] client sent/'
+  - '/error\] \[client (.*)\] client used/'
+  - '/error\] \[client (.*)\] File does not exist/'
+  - '/error\] \[client (.*)\] invalid /i'
+  - '/error\] \[client (.*)\] invalid method/'
+  - '/error\] \[client (.*)\] Invalid URI/'
+  - '/error\] \[client (.*)\] request failed/'
+  - '/error\] \[client (.*)\] suexec policy/'
