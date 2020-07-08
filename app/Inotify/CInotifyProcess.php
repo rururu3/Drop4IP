@@ -41,14 +41,14 @@ class CInotifyProcess {
   public function __destruct() {
   }
 
-  public function initialize($fd) {
+  public function initialize($fd) : void {
     $subject = $this->createSubject();
     foreach($this->inotifyFileList as $inotifyFile) {
       $inotifyFile->initialize($subject, $fd);
     }
   }
 
-  public function destroy() {
+  public function destroy() : void {
     foreach($this->inotifyFileList as $inotifyFile) {
       $inotifyFile->destroy();
     }
@@ -107,7 +107,7 @@ class CInotifyProcess {
   /**
    * inotifyイベント用
    */
-  public function inotifyEvent(array $events) {
+  public function inotifyEvent(array $events) : void {
     // 呼び出し用
     $_callList = [
       'IN_ACCESS' => IN_ACCESS,

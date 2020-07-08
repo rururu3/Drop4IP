@@ -78,7 +78,7 @@ class CDrop {
     $this->iptable->destroy();
   }
 
-  public function addLogs(string $service, string $source, int $createDate) {
+  public function addLogs(string $service, string $source, int $createDate) : void {
     // ログにデータを追加する
     $this->database->addLogData($service, $source, $createDate);
   }
@@ -89,7 +89,7 @@ class CDrop {
     return($count >= $needCount);
   }
 
-  public function addBan(string $source, string $protocol, string $port, string $rule, int $effectiveDate) {
+  public function addBan(string $source, string $protocol, string $port, string $rule, int $effectiveDate) : void {
     // キャッシュになかったら処理をする
     if(isset($this->cacheIPTables[$source][$protocol][$port][$rule]) === false) {
       // 先にDBに登録
@@ -103,7 +103,7 @@ class CDrop {
     }
   }
 
-  public function removeBan(string $source, string $protocol, string $port, string $rule) {
+  public function removeBan(string $source, string $protocol, string $port, string $rule) : void {
     // 先にDBから削除
     $this->database->removeBanData($source, $protocol, $port, $rule);
 

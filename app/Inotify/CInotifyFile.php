@@ -24,7 +24,7 @@ class CInotifyFile implements IInotifyEvent {
   public function __destruct() {
   }
 
-  public function initialize(ObserverInterface $subject, $fd) {
+  public function initialize(ObserverInterface $subject, $fd) : void {
     $this->subject = $subject;
     $this->fd = $fd;
 
@@ -38,7 +38,7 @@ class CInotifyFile implements IInotifyEvent {
     fseek($this->fp, 0, SEEK_END);
   }
 
-  public function destroy() {
+  public function destroy() : void {
     // メタデータ変更の監視を終了します
     inotify_rm_watch($this->fd, $this->wd);
     fclose($this->fp);
@@ -47,17 +47,17 @@ class CInotifyFile implements IInotifyEvent {
   /**
    * wd取得
    */
-  public function getWD() {
+  public function getWD() : int {
     return($this->wd);
   }
 
   //=====================================================================
   // IInotifyEventインターフェイス用
   //=====================================================================
-  public function IN_ACCESS() {
+  public function IN_ACCESS() : void {
 
   }
-  public function IN_MODIFY() {
+  public function IN_MODIFY() : void {
     // データがある分処理
     while(($buffer = fgets($this->fp, 8192)) !== false) {
       // trimをかけて改行を取り除く
@@ -67,49 +67,49 @@ class CInotifyFile implements IInotifyEvent {
     // これしないと複数回読み込んでくれない
     fseek($this->fp, 0, SEEK_END);
   }
-  public function IN_ATTRIB() {
+  public function IN_ATTRIB() : void {
     
   }
-  public function IN_CLOSE_WRITE() {
+  public function IN_CLOSE_WRITE() : void {
     
   }
-  public function IN_CLOSE_NOWRITE() {
+  public function IN_CLOSE_NOWRITE() : void {
     
   }
-  public function IN_OPEN() {
+  public function IN_OPEN() : void {
     
   }
-  public function IN_MOVED_FROM() {
+  public function IN_MOVED_FROM() : void {
     
   }
-  public function IN_MOVED_TO() {
+  public function IN_MOVED_TO() : void {
     
   }
-  public function IN_CREATE() {
+  public function IN_CREATE() : void {
     
   }
-  public function IN_DELETE() {
+  public function IN_DELETE() : void {
     
   }
-  public function IN_DELETE_SELF() {
+  public function IN_DELETE_SELF() : void {
     
   }
-  public function IN_MOVE_SELF() {
+  public function IN_MOVE_SELF() : void {
     
   }
-  public function IN_UNMOUNT() {
+  public function IN_UNMOUNT() : void {
     
   }
-  public function IN_Q_OVERFLOW() {
+  public function IN_Q_OVERFLOW() : void {
     
   }
-  public function IN_IGNORED() {
+  public function IN_IGNORED() : void {
     
   }
-  public function IN_CLOSE() {
+  public function IN_CLOSE() : void {
     
   }
-  public function IN_MOVE() {
+  public function IN_MOVE() : void {
     
   }
 }

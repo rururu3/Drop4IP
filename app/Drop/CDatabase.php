@@ -16,7 +16,7 @@ class CDatabase {
   public function __destruct() {
   }
 
-  public function initialize() {
+  public function initialize() : void {
     // テーブル作成(banされたデータ用)
     $sql = <<< EOM
 CREATE TABLE IF NOT EXISTS "bans" (
@@ -188,7 +188,7 @@ EOM;
   /**
    * 指定日で有効期限が過ぎてるデータを消す
    */
-  public function removeEffectiveDateOverList(int $date) {
+  public function removeEffectiveDateOverList(int $date) : bool {
     $sql = <<< EOM
 DELETE FROM `bans`
 WHERE `effective_date` < :effective_date

@@ -6,7 +6,6 @@ use App\CAppLog;
 // iptables
 // http://web.mit.edu/rhel-doc/4/RH-DOCS/rhel-rg-ja-4/s1-iptables-options.html
 class CIPTables {
-
   protected $chainName;
   protected $iptables = "/sbin/iptables";
   protected $ip6tables = "/sbin/ip6tables";
@@ -27,13 +26,17 @@ class CIPTables {
   /**
    * iptablesのチェインを初期化(削除＆再作成)
    */
-  public function initialize() {
+  public function initialize() : void {
     // 削除＆再作成
     $this->deleteChain($this->chainName);
     $this->addChain($this->chainName);
   }
 
+  /**
+   * 破棄処理
+   */
   public function destroy() : void {
+    $this->deleteChain($this->chainName);
   }
 
   /**
@@ -65,7 +68,7 @@ class CIPTables {
   /**
    * 指定情報でiptablesに追加
    */
-  public function addBanIP(string $source, string $protocol, string $port, string $rule) {
+  public function addBanIP(string $source, string $protocol, string $port, string $rule) : void {
     $command = "";
     if (filter_var($source, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
       // IPv4処理
@@ -84,7 +87,7 @@ class CIPTables {
   /**
    * 指定情報でiptablesから削除
    */
-  public function removeBanIP(string $source, string $protocol, string $port, string $rule) {
+  public function removeBanIP(string $source, string $protocol, string $port, string $rule) : void {
     $command = "";
     if (filter_var($source, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
       // IPv4処理
@@ -100,7 +103,7 @@ class CIPTables {
     }
   }
 
-  protected function readIPTables() {
+  protected function readIPTables() : void {
     $handle = popen("/sbin/iptables -L {$this->chainName} -n", "r");
     // リソース$PPから一行ずつ読み込む
     while (($str = fgets($handle)) !== false) {
@@ -112,7 +115,7 @@ class CIPTables {
   /**
    * system関数実行
    */
-  protected function execute(string $command) {
+  protected function execute(string $command) : void {
     CAppLog::getInstance()->debug($command);
     system($command);
   }
