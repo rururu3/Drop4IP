@@ -16,7 +16,9 @@ class CApp {
   protected $drop;
 
   protected $fd;
+
   protected $loop;
+  protected $disposable;
 
   protected $inotifyProcesseList = [];
 
@@ -62,6 +64,10 @@ class CApp {
   }
 
   public function destroy() : void {
+    echo 'destoroy' . PHP_EOL;
+
+    $this->disposable->dispose();
+
     foreach($this->inotifyProcesseList as $process) {
       $process->destroy();
     }
@@ -87,7 +93,7 @@ class CApp {
     CAppLog::getInstance()->debug('run');
     
     // 監視は1秒単位でいいや
-    Observable::interval(1000)
+    $this->disposable = Observable::interval(1000)
     ->subscribe(function ($v) {
       // 待機中のイベントが有るか
       if(inotify_queue_len($this->fd) > 0) {

@@ -17,6 +17,8 @@ class CDrop {
   protected $database;
   protected $ipTables;
 
+  protected $disposable;
+
   // キャッシュ用
   protected $cacheIPTables = [];
 
@@ -57,7 +59,7 @@ class CDrop {
     }
 
     // 監視は60秒単位でいいや
-    Observable::interval(60 * 1000)
+    $this->disposable = Observable::interval(60 * 1000)
     ->subscribe(function ($v) {
       // 時間による削除処理
       $date = Carbon::now()->add(10, 'day')->getTimestamp();
@@ -70,6 +72,8 @@ class CDrop {
   }
 
   public function destroy() : void {
+    $this->disposable->dispose();
+
     $this->database->destroy();
     $this->iptable->destroy();
   }
