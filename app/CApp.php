@@ -46,6 +46,9 @@ class CApp {
   public function __destruct() {
   }
 
+  /**
+   * 初期処理
+   */
   public function initialize() : void {
     // inotify インスタンスを開きます
     $this->fd = inotify_init();
@@ -63,6 +66,9 @@ class CApp {
     $this->drop->initialize();
   }
 
+  /**
+   * 破棄処理
+   */
   public function destroy() : void {
     echo 'destoroy' . PHP_EOL;
 

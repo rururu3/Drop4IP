@@ -41,6 +41,9 @@ class CInotifyProcess {
   public function __destruct() {
   }
 
+  /**
+   * 初期処理
+   */
   public function initialize($fd) : void {
     $subject = $this->createSubject();
     foreach($this->inotifyFileList as $inotifyFile) {
@@ -48,6 +51,9 @@ class CInotifyProcess {
     }
   }
 
+  /**
+   * 破棄処理
+   */
   public function destroy() : void {
     foreach($this->inotifyFileList as $inotifyFile) {
       $inotifyFile->destroy();

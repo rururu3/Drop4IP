@@ -37,10 +37,16 @@ class CAppLog {
     $this->logger = \Logger::getLogger("develop");
   }
 
+  /**
+   * インスタンス取得
+   */
   public static function getInstance() : CAppLog {
     return self::$instance ?? self::$instance = new self();
   }
 
+  /**
+   * マジックメソッドを利用してログクラスのメソッド呼び出し
+   */
   public function __call(string $method, array $args) {
     return($this->logger->{$method}(...$args));
   }

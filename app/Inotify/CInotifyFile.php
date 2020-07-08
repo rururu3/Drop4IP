@@ -24,6 +24,9 @@ class CInotifyFile implements IInotifyEvent {
   public function __destruct() {
   }
 
+  /**
+   * 初期処理
+   */
   public function initialize(ObserverInterface $subject, $fd) : void {
     $this->subject = $subject;
     $this->fd = $fd;
@@ -38,6 +41,9 @@ class CInotifyFile implements IInotifyEvent {
     fseek($this->fp, 0, SEEK_END);
   }
 
+  /**
+   * 破棄処理
+   */
   public function destroy() : void {
     // メタデータ変更の監視を終了します
     inotify_rm_watch($this->fd, $this->wd);

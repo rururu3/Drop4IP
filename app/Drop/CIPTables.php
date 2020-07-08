@@ -24,7 +24,7 @@ class CIPTables {
   }
 
   /**
-   * iptablesのチェインを初期化(削除＆再作成)
+   * 初期処理
    */
   public function initialize() : void {
     // 削除＆再作成
@@ -103,14 +103,14 @@ class CIPTables {
     }
   }
 
-  protected function readIPTables() : void {
-    $handle = popen("/sbin/iptables -L {$this->chainName} -n", "r");
-    // リソース$PPから一行ずつ読み込む
-    while (($str = fgets($handle)) !== false) {
-      $str = trim($str);
-    }
-    pclose($handle);
-  }
+  // protected function readIPTables() : void {
+  //   $handle = popen("/sbin/iptables -L {$this->chainName} -n", "r");
+  //   // リソース$PPから一行ずつ読み込む
+  //   while (($str = fgets($handle)) !== false) {
+  //     $str = trim($str);
+  //   }
+  //   pclose($handle);
+  // }
 
   /**
    * system関数実行

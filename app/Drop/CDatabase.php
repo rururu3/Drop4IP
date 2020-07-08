@@ -16,6 +16,9 @@ class CDatabase {
   public function __destruct() {
   }
 
+  /**
+   * 初期処理
+   */
   public function initialize() : void {
     // テーブル作成(banされたデータ用)
     $sql = <<< EOM
@@ -62,6 +65,9 @@ EOM;
     $this->pdo->query($sql);
   }
 
+  /**
+   * 破棄処理
+   */
   public function destroy() : void {
   }
 
