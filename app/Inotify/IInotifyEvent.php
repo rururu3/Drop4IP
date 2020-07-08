@@ -17,6 +17,6 @@ interface IInotifyEvent {
   public function IN_UNMOUNT() : void;
   public function IN_Q_OVERFLOW() : void;
   public function IN_IGNORED() : void;
-  public function IN_CLOSE() : void;
-  public function IN_MOVE() : void;
+  // public function IN_CLOSE() : void;
+  // public function IN_MOVE() : void;
 }

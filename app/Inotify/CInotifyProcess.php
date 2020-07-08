@@ -131,8 +131,8 @@ class CInotifyProcess {
       'IN_UNMOUNT' => IN_UNMOUNT,
       'IN_Q_OVERFLOW' => IN_Q_OVERFLOW,
       'IN_IGNORED' => IN_IGNORED,
-      'IN_CLOSE' => IN_CLOSE,
-      'IN_MOVE' => IN_MOVE,
+      // 'IN_CLOSE' => IN_CLOSE,
+      // 'IN_MOVE' => IN_MOVE,
     ];
 
     foreach($this->inotifyFileList as $inotifyFile) {
