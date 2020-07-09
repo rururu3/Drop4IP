@@ -77,14 +77,20 @@ class CInotifyFile implements IInotifyEvent {
    * ファイル読み込み処理
    */
   protected function readFile() : void {
+    $list = [];
+
     // データがある分処理
     while(($buffer = fgets($this->fp, 8192)) !== false) {
-      // trimをかけて改行を取り除く
-      $this->subject->onNext(trim($buffer));
+      $list[] = trim($buffer);
     }
 
     // これしないと複数回読み込んでくれない
     fseek($this->fp, 0, SEEK_END);
+
+    // データ数分処理
+    foreach($buffer as $v) {
+      $this->subject->onNext($v);
+    }
   }
 
   /**

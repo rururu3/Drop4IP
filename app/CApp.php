@@ -1,25 +1,16 @@
 <?php
 namespace App;
 
-// 使うライブラリ
-// Rx周り
-// https://github.com/ReactiveX/RxPHP
-use Rx\Observable;
 use React\EventLoop\Factory;
 use Rx\Scheduler;
-use Rx\Subject\Subject;
-use Rx\ObserverInterface;
 
 class CApp {
   protected static $instance;
 
   protected $drop;
 
-  protected $fd;
-
   protected $loop;
-  protected $disposable;
-
+  
   protected $inotifyProcesseList = [];
 
   public static function getInstance() : CApp {
@@ -50,11 +41,8 @@ class CApp {
    * 初期処理
    */
   public function initialize() : void {
-    // inotify インスタンスを開きます
-    $this->fd = inotify_init();
-
     foreach($this->inotifyProcesseList as $process) {
-      $process->initialize($this->fd);
+      $process->initialize();
     }
 
     // You only need to set the default scheduler once
@@ -72,15 +60,10 @@ class CApp {
   public function destroy() : void {
     echo 'destoroy' . PHP_EOL;
 
-    $this->disposable->dispose();
-
     foreach($this->inotifyProcesseList as $process) {
       $process->destroy();
     }
     $this->inotifyProcesseList = [];
-
-    // メタデータ変更の監視を終了します
-    fclose($this->fd);
     
     $this->drop->destroy();
   }
@@ -96,20 +79,14 @@ class CApp {
    * 実行処理部分
    */
   public function run() : void {
-    CAppLog::getInstance()->debug('run');
+    CAppLog::getInstance()->debug('app run');
     
-    // 監視は1秒単位でいいや
-    $this->disposable = Observable::interval(1000)
-    ->subscribe(function ($v) {
-      // 待機中のイベントが有るか
-      if(inotify_queue_len($this->fd) > 0) {
-        $events = inotify_read($this->fd);
-        foreach($this->inotifyProcesseList as $inotifyProcess) {
-          $inotifyProcess->inotifyEvent($events);
-        }
-      }
-    });
+    // プロセス実行
+    foreach($this->inotifyProcesseList as $process) {
+      $process->run();
+    }
 
+    // Rx
     $this->loop->run();
   }
 }

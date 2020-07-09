@@ -10,6 +10,12 @@ use Noodlehaus\Parser\Yaml;
 // https://github.com/briannesbitt/Carbon
 use Carbon\Carbon;
 
+// 使うライブラリ
+// Rx周り
+// https://github.com/ReactiveX/RxPHP
+use Rx\Observable;
+use React\EventLoop\Factory;
+use Rx\Scheduler;
 use Rx\Subject\Subject;
 use Rx\ObserverInterface;
 
@@ -20,6 +26,8 @@ class CInotifyProcess {
   protected $drop;
 
   protected $config;
+  protected $fd;
+  protected $disposable;
 
   protected $inotifyFileList = [];
 
@@ -33,6 +41,8 @@ class CInotifyProcess {
     foreach($this->config->get('logs') as $fileName) {
       $this->inotifyFileList[] = new CInotifyFile($fileName);
     }
+
+    $this->disposable = $this->fd = null;
   }
 
   /**
@@ -44,10 +54,13 @@ class CInotifyProcess {
   /**
    * 初期処理
    */
-  public function initialize($fd) : void {
+  public function initialize() : void {
+    // inotify インスタンスを開きます
+    $this->fd = inotify_init();
+
     $subject = $this->createSubject();
     foreach($this->inotifyFileList as $inotifyFile) {
-      $inotifyFile->initialize($subject, $fd);
+      $inotifyFile->initialize($subject, $this->fd);
     }
   }
 
@@ -55,10 +68,41 @@ class CInotifyProcess {
    * 破棄処理
    */
   public function destroy() : void {
+    if(is_null($this->disposable) === false) {
+      $this->disposable->dispose();
+    }
+    $this->disposable = null;
+
     foreach($this->inotifyFileList as $inotifyFile) {
       $inotifyFile->destroy();
     }
     $this->inotifyFileList = [];
+
+    // メタデータ変更の監視を終了します
+    if(is_null($this->fd) === false) {
+      fclose($this->fd);
+    }
+    $this->fd = null;
+  }
+
+  /**
+   * 実行処理部分
+   */
+  public function run() : void {
+    // ログだし
+    CAppLog::getInstance()->debug($this->config->get('service') . " run");
+
+    // 監視は1秒単位でいいや
+    if(is_null($this->disposable) !== false) {
+      $this->disposable = Observable::interval(1000)
+      ->subscribe(function ($v) {
+        // 待機中のイベントが有るか
+        if(inotify_queue_len($this->fd) > 0) {
+          $events = inotify_read($this->fd);
+          $this->inotifyEvent($events);
+        }
+      });
+    }
   }
 
   /**
@@ -67,6 +111,9 @@ class CInotifyProcess {
   protected function createSubject() : ObserverInterface {
     $subject = new Subject();
     $subject->subscribe(function($v) {
+      // ログだし
+      CAppLog::getInstance()->debug($this->config->get('service') . ": {$v}");
+
       // 正規表現でフィルタ
       foreach($this->config->get('regexes') as $regexStr) {
         // 正規表現にマッチした
@@ -141,7 +188,8 @@ class CInotifyProcess {
           // マスクに対応する関数を呼び出す
           foreach($_callList as $key => $value) {
             if($event['mask'] & $value) {
-              CAppLog::getInstance()->debug($key);
+              // ログだし
+              CAppLog::getInstance()->debug($this->config->get('service') . ": {$key} event");
               $inotifyFile->{$key}();
             }
           }
