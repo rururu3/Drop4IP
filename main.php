@@ -10,8 +10,6 @@ try {
   // アプリインスタンス取得
   $app = \App\CApp::getInstance();
 
-  throw new \Exception('hoge');
-
   // 初期設定
   $app->initialize();
 
