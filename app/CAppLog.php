@@ -18,6 +18,7 @@ class CAppLog {
       'loggers' => [
         'develop' => [
           'level' => 'DEBUG',
+          'additivity' => false,
           'appenders' => ['default'],
         ],
       ],
