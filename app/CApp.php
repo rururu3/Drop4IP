@@ -41,8 +41,10 @@ class CApp {
    * 初期処理
    */
   public function initialize() : void {
+    $processList = [];
     foreach($this->inotifyProcesseList as $process) {
       $process->initialize();
+      $processList[] = $process->getProcessName();
     }
 
     // You only need to set the default scheduler once
@@ -51,7 +53,7 @@ class CApp {
       return new Scheduler\EventLoopScheduler($this->loop);
     });
 
-    $this->drop->initialize();
+    $this->drop->initialize($processList);
   }
 
   /**

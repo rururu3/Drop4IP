@@ -88,7 +88,7 @@ class CInotifyFile implements IInotifyEvent {
     fseek($this->fp, 0, SEEK_END);
 
     // データ数分処理
-    foreach($buffer as $v) {
+    foreach($list as $v) {
       $this->subject->onNext($v);
     }
   }

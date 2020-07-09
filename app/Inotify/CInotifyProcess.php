@@ -86,11 +86,18 @@ class CInotifyProcess {
   }
 
   /**
+   * サービス名取得
+   */
+  public function getProcessName() : string {
+    return($this->config->get('process'));
+  }
+
+  /**
    * 実行処理部分
    */
   public function run() : void {
     // ログだし
-    CAppLog::getInstance()->debug($this->config->get('service') . " run");
+    CAppLog::getInstance()->debug($this->getProcessName() . " run");
 
     // 監視は1秒単位でいいや
     if(is_null($this->disposable) !== false) {
@@ -112,7 +119,7 @@ class CInotifyProcess {
     $subject = new Subject();
     $subject->subscribe(function($v) {
       // ログだし
-      CAppLog::getInstance()->debug($this->config->get('service') . ": {$v}");
+      CAppLog::getInstance()->debug($this->getProcessName() . ": {$v}");
 
       // 正規表現でフィルタ
       foreach($this->config->get('regexes') as $regexStr) {
@@ -122,14 +129,14 @@ class CInotifyProcess {
           if (filter_var($matches[1], FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
             // ログに追加する
             $this->drop->addLogs(
-              $this->config->get('service'),
+              $this->getProcessName(),
               $matches[1],
               Carbon::now()->getTimestamp()
             );
 
             // バンするのに必要な件数データが有るかチェック
             if($this->drop->checkAddBan(
-              $this->config->get('service'),
+              $this->getProcessName(),
               $matches[1],
               Carbon::now()->sub(1, 'day')->getTimestamp(),
               Carbon::now()->getTimestamp(),
@@ -140,6 +147,7 @@ class CInotifyProcess {
                 foreach($this->config->get('ports') as $port) {
                   foreach($this->config->get('rules') as $rule) {
                     $this->drop->addBan(
+                      $this->getProcessName(),
                       $matches[1],
                       $protocol,
                       $port,
@@ -189,7 +197,7 @@ class CInotifyProcess {
           foreach($_callList as $key => $value) {
             if($event['mask'] & $value) {
               // ログだし
-              CAppLog::getInstance()->debug($this->config->get('service') . ": {$key} event");
+              CAppLog::getInstance()->debug($this->getProcessName() . ": {$key} event");
               $inotifyFile->{$key}();
             }
           }

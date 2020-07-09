@@ -24,6 +24,7 @@ class CDatabase {
     $sql = <<< EOM
 CREATE TABLE IF NOT EXISTS "bans" (
   "id"              INTEGER,
+  "process"         TEXT,
   "source"          TEXT,
   "protocol"        TEXT,
   "port"            TEXT,
@@ -44,7 +45,7 @@ EOM;
     $sql = <<< EOM
 CREATE TABLE IF NOT EXISTS "logs" (
   "id"              INTEGER,
-  "service"         TEXT,
+  "process"         TEXT,
   "source"          TEXT,
   "create_date"     INTEGER,
   PRIMARY KEY("id" AUTOINCREMENT)
@@ -54,13 +55,13 @@ EOM;
 
     // インデックス作成
     $sql = <<< EOM
-CREATE INDEX IF NOT EXISTS logs_sc_idx ON logs (service, create_date);
+CREATE INDEX IF NOT EXISTS logs_pc_idx ON logs (process, create_date);
 EOM;
     $this->pdo->query($sql);
 
     // インデックス作成
     $sql = <<< EOM
-CREATE INDEX IF NOT EXISTS logs_cs_idx ON logs (create_date, service);
+CREATE INDEX IF NOT EXISTS logs_cp_idx ON logs (create_date, process);
 EOM;
     $this->pdo->query($sql);
   }
@@ -74,13 +75,13 @@ EOM;
   /**
    * ログにデータを追加
    */
-  public function addLogData(string $service, string $source, int $createDate) : bool {
+  public function addLogData(string $process, string $source, int $createDate) : bool {
     $sql = <<< EOM
-INSERT INTO `logs` (`service`, `source`, `create_date`)
-VALUES(:service, :source, :create_date);
+INSERT INTO `logs` (`process`, `source`, `create_date`)
+VALUES(:process, :source, :create_date);
 EOM;
     $stmt = $this->pdo->prepare($sql);
-    $stmt->bindParam(':service', $service, \PDO::PARAM_STR);
+    $stmt->bindParam(':process', $process, \PDO::PARAM_STR);
     $stmt->bindParam(':source', $source, \PDO::PARAM_STR);
     $stmt->bindParam(':create_date', $createDate, \PDO::PARAM_INT);
     return($stmt->execute());
@@ -89,11 +90,11 @@ EOM;
   /**
    * 指定サービスのソースにおいて指定期間でのデータ数を返す
    */
-  public function getLogDataCountBetween(string $service, string $source, int $fromDate, int $toDate) {
+  public function getLogDataCountBetween(string $process, string $source, int $fromDate, int $toDate) {
     $sql = <<< EOM
 SELECT COUNT(*) as `cnt`
 FROM `logs`
-WHERE `service` = :service
+WHERE `process` = :process
 AND `source` = :source
 AND `create_date` BETWEEN :from_date AND :to_date;
 EOM;
@@ -101,7 +102,7 @@ EOM;
     $maxDate = max($fromDate, $toDate);
 
     $stmt = $this->pdo->prepare($sql);
-    $stmt->bindParam(':service', $service, \PDO::PARAM_STR);
+    $stmt->bindParam(':process', $process, \PDO::PARAM_STR);
     $stmt->bindParam(':source', $source, \PDO::PARAM_STR);
     $stmt->bindParam(':from_date', $minDate, \PDO::PARAM_INT);
     $stmt->bindParam(':to_date', $maxDate, \PDO::PARAM_INT);
@@ -118,12 +119,13 @@ EOM;
   /**
    * DBにBanしたデータを追加(起動時にこのデータをもとにiptables作成する)
    */
-  public function addBanData(string $source, string $protocol, string $port, string $rule, int $effectiveDate) : bool {
+  public function addBanData(string $process, string $source, string $protocol, string $port, string $rule, int $effectiveDate) : bool {
     $sql = <<< EOM
-INSERT INTO `bans` (`source`, `protocol`, `port`, `rule`, `effective_date`)
-VALUES(:source, :protocol, :port, :rule, :effective_date);
+INSERT INTO `bans` (`process`, `source`, `protocol`, `port`, `rule`, `effective_date`)
+VALUES(:process, :source, :protocol, :port, :rule, :effective_date);
 EOM;
     $stmt = $this->pdo->prepare($sql);
+    $stmt->bindParam(':process', $process, \PDO::PARAM_STR);
     $stmt->bindParam(':source', $source, \PDO::PARAM_STR);
     $stmt->bindParam(':protocol', $protocol, \PDO::PARAM_STR);
     $stmt->bindParam(':port', $port, \PDO::PARAM_STR);
@@ -133,7 +135,7 @@ EOM;
   }
 
   /**
-   * 指定日で有効期限が過ぎてるデータを返す
+   * バンリストを返す
    */
   public function getBanList() {
     $sql = <<< EOM
@@ -175,15 +177,17 @@ EOM;
   /**
    * DBからBanしたデータを削除
    */
-  public function removeBanData(string $source, string $protocol, string $port, string $rule) : bool {
+  public function removeBanData(string $process, string $source, string $protocol, string $port, string $rule) : bool {
     $sql = <<< EOM
 DELETE FROM `bans`
-WHERE `source` = :source
+WHERE `process` = :process
+AND `source` = :source
 AND `protocol` = :protocol
 AND `port` = :port
 AND `rule` = :rule
 EOM;
     $stmt = $this->pdo->prepare($sql);
+    $stmt->bindParam(':process', $process, \PDO::PARAM_STR);
     $stmt->bindParam(':source', $source, \PDO::PARAM_STR);
     $stmt->bindParam(':protocol', $protocol, \PDO::PARAM_STR);
     $stmt->bindParam(':port', $port, \PDO::PARAM_STR);

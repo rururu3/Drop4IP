@@ -6,15 +6,16 @@ use App\CAppLog;
 // iptables
 // http://web.mit.edu/rhel-doc/4/RH-DOCS/rhel-rg-ja-4/s1-iptables-options.html
 class CIPTables {
-  protected $chainName;
   protected $iptables = "/sbin/iptables";
   protected $ip6tables = "/sbin/ip6tables";
+
+  protected $processList;
 
   /**
    * constructor
    */
-  public function __construct(string $chainName) {
-    $this->chainName = $chainName;
+  public function __construct() {
+    $this->processList = [];
   }
 
   /**
@@ -26,49 +27,55 @@ class CIPTables {
   /**
    * 初期処理
    */
-  public function initialize() : void {
+  public function initialize(array $processList) : void {
+    $this->processList = $processList;
+
     // 削除＆再作成
-    $this->deleteChain($this->chainName);
-    $this->addChain($this->chainName);
+    foreach($this->processList as $process) {
+      $this->deleteChain($process);
+      $this->addChain($process);
+    }
   }
 
   /**
    * 破棄処理
    */
   public function destroy() : void {
-    $this->deleteChain($this->chainName);
+    foreach($this->processList as $process) {
+      $this->deleteChain($process);
+    }
   }
 
   /**
    * チェインを削除する
    */
-  public function deleteChain(string $chainName) : void {
+  public function deleteChain(string $process) : void {
     foreach([$this->iptables, $this->ip6tables] as $iptables) {
       // INPUTチェインからチェインを削除
-      $this->execute("{$iptables} -D INPUT -j {$chainName}");
+      $this->execute("{$iptables} -D INPUT -j {$process}");
       // チェインを削除
-      $this->execute("{$iptables} -F {$chainName}");
-      $this->execute("{$iptables} -X {$chainName}");
+      $this->execute("{$iptables} -F {$process}");
+      $this->execute("{$iptables} -X {$process}");
     }
   }
 
   /**
    * チェインを追加するする
    */
-  public function addChain(string $chainName) : void {
+  public function addChain(string $process) : void {
     foreach([$this->iptables, $this->ip6tables] as $iptables) {
       // チェインを追加する
-      $this->execute("{$iptables} -N {$chainName}");
-      $this->execute("{$iptables} -A {$chainName} -j RETURN");
+      $this->execute("{$iptables} -N {$process}");
+      $this->execute("{$iptables} -A {$process} -j RETURN");
       // INPUTチェインにチェインを追加(最初に)
-      $this->execute("{$iptables} -I INPUT -j {$chainName}");
+      $this->execute("{$iptables} -I INPUT -j {$process}");
     }
   }
 
   /**
    * 指定情報でiptablesに追加
    */
-  public function addBanIP(string $source, string $protocol, string $port, string $rule) : void {
+  public function addBanIP(string $process, string $source, string $protocol, string $port, string $rule) : void {
     $command = "";
     if (filter_var($source, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
       // IPv4処理
@@ -80,14 +87,14 @@ class CIPTables {
     }
 
     if(empty($command) === false) {
-      $this->execute("{$command} -I {$this->chainName} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
+      $this->execute("{$command} -I {$process} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
     }
   }
 
   /**
    * 指定情報でiptablesから削除
    */
-  public function removeBanIP(string $source, string $protocol, string $port, string $rule) : void {
+  public function removeBanIP(string $process, string $source, string $protocol, string $port, string $rule) : void {
     $command = "";
     if (filter_var($source, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
       // IPv4処理
@@ -99,7 +106,7 @@ class CIPTables {
     }
 
     if(empty($command) === false) {
-      $this->execute("{$command} -D {$this->chainName} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
+      $this->execute("{$command} -D {$process} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
     }
   }
 
