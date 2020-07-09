@@ -118,7 +118,6 @@ class CInotifyFile implements IInotifyEvent {
 
           // ファイル読み込み
           $this->readFile();
-      
         }
       });
     }
