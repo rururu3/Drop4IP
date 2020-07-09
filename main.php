@@ -4,37 +4,56 @@ declare(ticks = 1);
 // autoloadでライブラリ読み込み
 require_once __DIR__ . '/vendor/autoload.php';
 
+use App\CAppLog;
 
-// アプリインスタンス取得
-$app = \App\CApp::getInstance();
+try {
+  // アプリインスタンス取得
+  $app = \App\CApp::getInstance();
 
-// 初期設定
-$app->initialize();
+  throw new \Exception('hoge');
 
-// シグナルハンドラ関数
-$callback = function($signo) use ($app) {
-  switch ($signo) {
-    case SIGTERM:
-      // シャットダウンの処理
-      break;
-    case SIGHUP:
-      // 再起動の処理
-      break;
-    case SIGINT:
-      break;
-    default:
-      // それ以外のシグナルの処理
-      break;
-  }
+  // 初期設定
+  $app->initialize();
 
-  // 破棄
-  $app->destroy();
-};
+  // シグナルハンドラ関数
+  $callback = function($signo) use ($app) {
+    switch ($signo) {
+      case SIGTERM:
+        // シャットダウンの処理
+        break;
+      case SIGHUP:
+        // 再起動の処理
+        break;
+      case SIGINT:
+        break;
+      default:
+        // それ以外のシグナルの処理
+        break;
+    }
 
-// シグナル登録
-pcntl_signal(SIGTERM, $callback);
-pcntl_signal(SIGHUP,  $callback);
-pcntl_signal(SIGINT, $callback);
+    // 破棄
+    $app->destroy();
+  };
 
-// 実行
-$app->run();
+  // シグナル登録
+  pcntl_signal(SIGTERM, $callback);
+  pcntl_signal(SIGHUP,  $callback);
+  pcntl_signal(SIGINT, $callback);
+
+  // 実行
+  $app->run();
+}
+catch(\Exception $e) {
+  // ログだし
+  CAppLog::getInstance()->error($e->getTraceAsString());
+  CAppLog::getInstance()->error("  thrown in " . $e->getFile() . " on line " . $e->getLine());
+
+  throw $e;
+}
+catch(\Error $e) {
+  // ログだし
+  CAppLog::getInstance()->error($e->getTraceAsString());
+  CAppLog::getInstance()->error("  thrown in " . $e->getFile() . " on line " . $e->getLine());
+
+  throw $e;
+}
