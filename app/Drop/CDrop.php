@@ -65,7 +65,8 @@ class CDrop {
     $this->disposable = Observable::interval(60 * 1000)
     ->subscribe(function ($v) {
       // 時間による削除処理
-      $date = Carbon::now()->add(10, 'day')->getTimestamp();
+      // $date = Carbon::now()->add(10, 'day')->getTimestamp();
+      $date = Carbon::now()->getTimestamp();
       $list = $this->database->getEffectiveDateOverList($date);
       foreach($list as $v) {
         $this->removeBan($v->process, $v->source, $v->protocol, $v->port, $v->rule);

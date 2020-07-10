@@ -1,0 +1,12 @@
+process:
+  postfix
+logs:
+  - /var/log/mail.log
+protocols:
+  - all
+ports:
+  - all
+rules:
+  - DROP
+regexes:
+  - '/^(?P<date>(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+[0-9]{1,2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}).*\[(?P<ip>.*)\]:\sSASL\sLOGIN\sauthentication\sfailed:\sauthentication\sfailure$/i'

@@ -25,7 +25,7 @@ class CApp {
 
     // configフォルダに有るものを読み込む(アプリ用設定ファイル以外)
     foreach(glob('config/*.yml') as $file){
-      if(preg_match('/(app.yml|apache.yml|postfix.yml)/i', $file, $m) === 0) {
+      if(preg_match('/(app.yml)/i', $file, $m) === 0) {
         $this->inotifyProcesseList[] = new Inotify\CInotifyProcess($this->drop, $file);
       }
     }
