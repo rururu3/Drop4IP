@@ -125,20 +125,28 @@ class CInotifyProcess {
       foreach($this->config->get('regexes') as $regexStr) {
         // 正規表現にマッチした
         if(preg_match($regexStr, $v, $matches) === 1) {
+          // ipアドレスと日付取得
+          $ipAdder = $matches['ip'];
+          $date = empty($matches['date']) === false ?
+                  Carbon::parse($matches['date'])->getTimestamp()
+                  : Carbon::now()->getTimestamp();
+
+          CAppLog::getInstance()->debug("ipAdder: {$ipAdder} date: {$date}");
+
           // 対象文字列がIPアドレス(IPv4とIPv6のプライベート領域および予約済み除く)
-          if (filter_var($matches[1], FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
+          if (filter_var($ipAdder, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
             // ログに追加する
             $this->drop->addLogs(
               $this->getProcessName(),
-              $matches[1],
-              Carbon::now()->getTimestamp()
+              $ipAdder,
+              $date
             );
 
             // バンするのに必要な件数データが有るかチェック
             if($this->drop->checkAddBan(
               $this->getProcessName(),
-              $matches[1],
-              Carbon::now()->sub(1, 'day')->getTimestamp(),
+              $ipAdder,
+              Carbon::now()->sub(1, 'day')->getTimestamp(),   // TODO: 範囲は後で決める
               Carbon::now()->getTimestamp(),
               10  // TODO:件数@10は後で変える
               ) !== false) {
@@ -148,11 +156,11 @@ class CInotifyProcess {
                   foreach($this->config->get('rules') as $rule) {
                     $this->drop->addBan(
                       $this->getProcessName(),
-                      $matches[1],
+                      $ipAdder,
                       $protocol,
                       $port,
                       $rule,
-                      Carbon::now()->add(1, 'day')->getTimestamp()
+                      Carbon::now()->add(1, 'day')->getTimestamp()    // TODO: 期間は後で変える
                     );
                   }
                 }
