@@ -87,7 +87,12 @@ class CIPTables {
     }
 
     if(empty($command) === false) {
-      $this->execute("{$command} -I {$process} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
+      if(strtolower($protocol) === 'all' && strtolower($protocol) === 'all') {
+        $this->execute("{$command} -I {$process} --source {$source} --jump {$rule}");
+      }
+      else {
+        $this->execute("{$command} -I {$process} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
+      }
     }
   }
 
@@ -106,7 +111,12 @@ class CIPTables {
     }
 
     if(empty($command) === false) {
-      $this->execute("{$command} -D {$process} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
+      if(strtolower($protocol) === 'all' && strtolower($protocol) === 'all') {
+        $this->execute("{$command} -D {$process} --source {$source} --jump {$rule}");
+      }
+      else {
+        $this->execute("{$command} -D {$process} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
+      }
     }
   }
 
