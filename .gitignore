@@ -11,3 +11,4 @@ composer.phar
 # conf folder
 /config/
 !/config/app.yml
+!/config/postfix.yml
