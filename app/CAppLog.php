@@ -26,7 +26,11 @@ class CAppLog {
         'default' => [
           'class' => 'LoggerAppenderFile',
           'layout' => [
-            'class' => 'LoggerLayoutSimple'
+            'class' => 'LoggerLayoutPattern',
+            'params' => [
+              // 'conversionPattern' => '%date %logger %-5level %msg%n',
+              'conversionPattern' => '%date %-5level - %msg%n',
+            ],
           ],
           'params' => [
             'file' => __DIR__ . '/../storage/ipban.log',
