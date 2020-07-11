@@ -6,6 +6,9 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use App\CAppLog;
 
+// https://github.com/briannesbitt/Carbon
+use Carbon\Carbon;
+
 try {
   // 引数による処理変更
   switch($argv[1] ?? '') {
@@ -63,19 +66,34 @@ try {
         'protocol:',
         'port:',
         'rule:',
-        'effectivedate::',
+        'effectivesecond::',
       ];
       $options = getopt('', $longopts);
 
       // パラメータ処理
       if(isset($options['addban']) !== false) {
         App\CAppClient::getInstance()->initialize();
-        App\CAppClient::getInstance()->send(['addban']);
+        App\CAppClient::getInstance()->send([
+          'tag' => 'addban',
+          'process' => $options['process'] ?? '',
+          'source' => $options['source'] ?? '',
+          'protocol' => $options['protocol'] ?? '',
+          'port' => $options['hohportohoho'] ?? '',
+          'rule' => $options['rule'] ?? '',
+          'effective_date' => Carbon::now()->add($options['effectivesecond'] ?? 3600, 'second')->getTimestamp(),
+        ]);
         App\CAppClient::getInstance()->destroy();
       }
       else if(isset($options['removeban']) !== false) {
         App\CAppClient::getInstance()->initialize();
-        App\CAppClient::getInstance()->send(['removeban']);
+        App\CAppClient::getInstance()->send([
+          'tag' => 'removeban',
+          'process' => $options['process'] ?? '',
+          'source' => $options['source'] ?? '',
+          'protocol' => $options['protocol'] ?? '',
+          'port' => $options['hohportohoho'] ?? '',
+          'rule' => $options['rule'] ?? '',
+        ]);
         App\CAppClient::getInstance()->destroy();
       }
       break;

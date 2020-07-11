@@ -3,6 +3,9 @@ namespace App;
 
 use Rx\Observable;
 
+// https://github.com/briannesbitt/Carbon
+use Carbon\Carbon;
+
 class CAppServer {
   protected static $instance;
 
@@ -93,7 +96,33 @@ class CAppServer {
         }
         else {
           if(($json = json_decode($buffer, false)) !== null) {
-            var_dump($json);
+            switch(strtolower($json->tag ?? '')) {
+              case 'addban':
+                if (filter_var($json->source ?? '', FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
+                  $this->drop->addBan(
+                    $json->process,
+                    $json->source,
+                    $json->protocol ?? 'all',
+                    $json->port ?? 'all',
+                    $json->rule ?? 'DROP',
+                    $json->effective_date ?? Carbon::now()->getTimestamp(),
+                  );
+                }
+                break;
+              case 'removeban':
+                if (filter_var($json->source ?? '', FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
+                  $this->drop->removeBan(
+                    $json->process,
+                    $json->source,
+                    $json->protocol ?? 'all',
+                    $json->port ?? 'all',
+                    $json->rule ?? 'DROP'
+                  );
+                }
+                break;
+              default:
+                break;
+            }
           }
         }
       }

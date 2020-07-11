@@ -16,6 +16,7 @@ class CDrop {
   protected $config;
   protected $database;
   protected $ipTables;
+  protected $processList;
 
   protected $disposable;
 
@@ -42,6 +43,8 @@ class CDrop {
    * 初期処理
    */
   public function initialize(array $processList) : void {
+    $this->processList = $processList;
+
     $this->database->initialize();
     $this->iptable->initialize($processList);
 
@@ -55,8 +58,9 @@ class CDrop {
     $list = $this->database->getBanList();
     foreach($list as $v) {
       // iptablesに登録
-      $this->iptable->addBanIP($v->process, $v->source, $v->protocol, $v->port, $v->rule);
-
+      if(isset($this->cacheIPTables[$v->source][$v->protocol][$v->port][$v->rule]) === false) {
+        $this->iptable->addBanIP($v->process, $v->source, $v->protocol, $v->port, $v->rule);
+      }
       // キャッシュに登録
       $this->cacheIPTables[$v->source][$v->protocol][$v->port][$v->rule] = 1;
     }
@@ -103,6 +107,11 @@ class CDrop {
    * バンに追加する
    */
   public function addBan(string $process, string $source, string $protocol, string $port, string $rule, int $effectiveDate) : void {
+    // プロセスになければ処理しない
+    if(in_array($process, $this->processList) === false) {
+      return;
+    }
+
     // キャッシュになかったら処理をする
     if(isset($this->cacheIPTables[$process][$source][$protocol][$port][$rule]) === false) {
       // 先にDBに登録
@@ -120,6 +129,11 @@ class CDrop {
    * バンを削除する
    */
   public function removeBan(string $process, string $source, string $protocol, string $port, string $rule) : void {
+    // プロセスになければ処理しない
+    if(in_array($process, $this->processList) === false) {
+      return;
+    }
+
     // 先にDBから削除
     $this->database->removeBanData($process, $source, $protocol, $port, $rule);
 

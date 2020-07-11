@@ -19,7 +19,7 @@ class CApp {
 
   protected $loop;
   
-  protected $inotifyProcesseList = [];
+  protected $inotifyProcesseList;
 
   public static function getInstance() : CApp {
     return self::$instance ?? self::$instance = new self();
@@ -32,6 +32,8 @@ class CApp {
     $this->config = new Config('config/app.yml');
 
     $this->drop = new Drop\CDrop();
+
+    $this->inotifyProcesseList = [];
   } 
 
   /**
