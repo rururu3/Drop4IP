@@ -7,39 +7,79 @@ require_once __DIR__ . '/vendor/autoload.php';
 use App\CAppLog;
 
 try {
-  // アプリインスタンス取得
-  $app = \App\CApp::getInstance();
+  // 引数による処理変更
+  switch($argv[1] ?? '') {
+    case 'start':
+      // アプリインスタンス取得
+      $app = \App\CApp::getInstance();
 
-  // 初期設定
-  $app->initialize();
+      // 初期設定
+      $app->initialize();
 
-  // シグナルハンドラ関数
-  $callback = function($signo) use ($app) {
-    switch ($signo) {
-      case SIGTERM:
-        // シャットダウンの処理
-        break;
-      case SIGHUP:
-        // 再起動の処理
-        break;
-      case SIGINT:
-        break;
-      default:
-        // それ以外のシグナルの処理
-        break;
-    }
+      // シグナルハンドラ関数
+      $callback = function($signo) use ($app) {
+        switch ($signo) {
+          case SIGTERM:
+            // シャットダウンの処理
+            break;
+          case SIGHUP:
+            // 再起動の処理
+            break;
+          case SIGINT:
+            break;
+          default:
+            // それ以外のシグナルの処理
+            break;
+        }
 
-    // 破棄
-    $app->destroy();
-  };
+        // 破棄
+        $app->destroy();
+      };
 
-  // シグナル登録
-  pcntl_signal(SIGTERM, $callback);
-  pcntl_signal(SIGHUP,  $callback);
-  pcntl_signal(SIGINT, $callback);
+      // シグナル登録
+      pcntl_signal(SIGTERM, $callback);
+      pcntl_signal(SIGHUP,  $callback);
+      pcntl_signal(SIGINT, $callback);
 
-  // 実行
-  $app->run();
+      // 実行
+      $app->run();
+      break;
+    case 'stop':
+      // exec('/usr/bin/killall hoge');
+      break;
+    case 'restart':
+      break;
+    case 'reload':
+      break;
+    case 'list':
+      break;
+    default:
+      // コマンドライン引数のリストからオプションを取得する
+      $longopts = [
+        'addban',
+        'removeban',
+        'process:',
+        'source:',
+        'protocol:',
+        'port:',
+        'rule:',
+        'effectivedate::',
+      ];
+      $options = getopt('', $longopts);
+      
+      // パラメータ処理
+      if(isset($options['addban']) !== false) {
+        App\CAppClient::getInstance()->initialize();
+        App\CAppClient::getInstance()->send('addbun');
+        App\CAppClient::getInstance()->destroy();
+      }
+      else if(isset($options['removeban']) !== false) {
+        App\CAppClient::getInstance()->initialize();
+        App\CAppClient::getInstance()->send('removeban');
+        App\CAppClient::getInstance()->destroy();
+      }
+      break;
+  }
 }
 catch(\Exception $e) {
   // ログだし

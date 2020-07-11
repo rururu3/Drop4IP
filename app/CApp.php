@@ -4,10 +4,18 @@ namespace App;
 use React\EventLoop\Factory;
 use Rx\Scheduler;
 
+// Config周り
+// https://github.com/hassankhan/config
+use Noodlehaus\Config;
+use Noodlehaus\Parser\Json;
+use Noodlehaus\Parser\Yaml;
+
 class CApp {
   protected static $instance;
 
   protected $drop;
+  protected $server;
+  protected $config;
 
   protected $loop;
   
@@ -21,14 +29,9 @@ class CApp {
    * constructor
    */
   protected function __construct() {
-    $this->drop = new Drop\CDrop();
+    $this->config = new Config('config/app.yml');
 
-    // configフォルダに有るものを読み込む(アプリ用設定ファイル以外)
-    foreach(glob('config/*.yml') as $file){
-      if(preg_match('/(app.yml)/i', $file, $m) === 0) {
-        $this->inotifyProcesseList[] = new Inotify\CInotifyProcess($this->drop, $file);
-      }
-    }
+    $this->drop = new Drop\CDrop();
   } 
 
   /**
@@ -41,10 +44,18 @@ class CApp {
    * 初期処理
    */
   public function initialize() : void {
+    CAppServer::getInstance()->initialize($this->config->get('sock'));
+
+    // configフォルダに有るものを読み込む(アプリ用設定ファイル以外)
     $processList = [];
-    foreach($this->inotifyProcesseList as $process) {
-      $process->initialize();
-      $processList[] = $process->getProcessName();
+    foreach(glob('config/*.yml') as $file){
+      if(preg_match('/(app.yml)/i', $file, $m) === 0) {
+        $process = new Inotify\CInotifyProcess($this->drop, $file);
+        $process->initialize();
+
+        $this->inotifyProcesseList[] = $process;
+        $processList[] = $process->getProcessName();
+      }
     }
 
     // You only need to set the default scheduler once
@@ -68,6 +79,8 @@ class CApp {
     $this->inotifyProcesseList = [];
     
     $this->drop->destroy();
+
+    CAppServer::getInstance()->destroy();
   }
 
   /**
@@ -87,6 +100,7 @@ class CApp {
     foreach($this->inotifyProcesseList as $process) {
       $process->run();
     }
+    CAppServer::getInstance()->run();
 
     // Rx
     $this->loop->run();
