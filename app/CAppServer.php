@@ -29,8 +29,9 @@ class CAppServer {
   /**
    * 初期処理
    */
-  public function initialize(string $sockFileName) : void {
+  public function initialize(string $sockFileName, Drop\CDrop $drop) : void {
     $this->sockFileName = $sockFileName;
+    $this->drop = $drop;
 
     // ソケット作成
     // https://www.php.net/manual/ja/function.socket-create.php
@@ -91,7 +92,9 @@ class CAppServer {
           echo socket_last_error() . PHP_EOL;
         }
         else {
-          echo $buffer . PHP_EOL;
+          if(($json = json_decode($buffer, false)) !== null) {
+            var_dump($json);
+          }
         }
       }
     });

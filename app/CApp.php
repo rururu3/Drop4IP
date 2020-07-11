@@ -44,7 +44,7 @@ class CApp {
    * 初期処理
    */
   public function initialize() : void {
-    CAppServer::getInstance()->initialize($this->config->get('sock'));
+    CAppServer::getInstance()->initialize($this->config->get('sock'), $this->drop);
 
     // configフォルダに有るものを読み込む(アプリ用設定ファイル以外)
     $processList = [];

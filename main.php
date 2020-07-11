@@ -66,16 +66,16 @@ try {
         'effectivedate::',
       ];
       $options = getopt('', $longopts);
-      
+
       // パラメータ処理
       if(isset($options['addban']) !== false) {
         App\CAppClient::getInstance()->initialize();
-        App\CAppClient::getInstance()->send('addbun');
+        App\CAppClient::getInstance()->send(['addban']);
         App\CAppClient::getInstance()->destroy();
       }
       else if(isset($options['removeban']) !== false) {
         App\CAppClient::getInstance()->initialize();
-        App\CAppClient::getInstance()->send('removeban');
+        App\CAppClient::getInstance()->send(['removeban']);
         App\CAppClient::getInstance()->destroy();
       }
       break;

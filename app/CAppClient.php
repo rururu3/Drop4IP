@@ -64,9 +64,10 @@ class CAppClient {
   /**
    * 実行中のプロセスにメッセージ送信する
    */
-  public function send($msg) {
+  public function send(array $arr) {
+    $jsonEncode = json_encode($arr);
     // ソケット内容読み込み
-    if(socket_send($this->socket, $msg, strlen($msg), 0) === false) {
+    if(socket_send($this->socket, $jsonEncode, strlen($jsonEncode), 0) === false) {
       echo socket_last_error() . PHP_EOL;
     }
   }
