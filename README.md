@@ -33,5 +33,17 @@ chmod 666 storage/ipban.log
 ***
 ## 実行
 ```
-php ./main.php
+php ./main.php start
+```
+
+***
+## 手動バン追加(サンプル)
+```
+php ./main.php --addban --process プロセス名(conf設定) --source IPアドレス --protocol all --port all --rule DROP --effectivesecond 現在からの有効期限(second)
+```
+
+***
+## 手動バン削除(サンプル)
+```
+php ./main.php --removeban --process プロセス名(conf設定) --source IPアドレス --protocol all --port all --rule DROP
 ```
