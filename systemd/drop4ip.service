@@ -1,0 +1,14 @@
+[Unit]
+Description=Drop4IP Service
+After=network.target iptables.service firewalld.service firewalld.service
+
+[Service]
+Type=simple
+ExecStart=/home/pi/GitHubProjects/Drop4IP/drop4ipc start
+ExecStop=/home/pi/GitHubProjects/Drop4IP/drop4ipc stop
+ExecReload=/home/pi/GitHubProjects/Drop4IP/drop4ipc reload
+PIDFile=/home/pi/GitHubProjects/Drop4IP/storage/drop4ip.pid
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

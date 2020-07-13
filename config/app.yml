@@ -2,3 +2,5 @@ dns:
   sqlite:./storage/database.sqlite3
 sock:
   ./storage/drop4ip.sock
+pid:
+  ./storage/drop4ip.pid
