@@ -118,8 +118,11 @@ class CInotifyProcess {
   protected function createSubject() : ObserverInterface {
     $subject = new Subject();
     $subject->subscribe(function($v) {
+      $start = hrtime(true);
+
       // ログだし
       CAppLog::getInstance()->debug($this->getProcessName() . ": {$v}");
+      CAppLog::getInstance()->debug(__CLASS__ . ':' . __FUNCTION__ . " start miliseconds: " . (hrtime(true) - $start) / (1000 * 1000));
 
       // 正規表現でフィルタ
       foreach($this->config->get('regexes') as $regexStr) {
@@ -135,12 +138,16 @@ class CInotifyProcess {
 
           // 対象文字列がIPアドレス(IPv4とIPv6のプライベート領域および予約済み除く)
           if (filter_var($ipAdder, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
+            CAppLog::getInstance()->debug(__CLASS__ . ':' . __FUNCTION__ . " insert miliseconds: " . (hrtime(true) - $start) / (1000 * 1000));
+
             // ログに追加する
             $this->drop->addLogs(
               $this->getProcessName(),
               $ipAdder,
               $date
             );
+
+            CAppLog::getInstance()->debug(__CLASS__ . ':' . __FUNCTION__ . " added miliseconds: " . (hrtime(true) - $start) / (1000 * 1000));
 
             // バンするのに必要な件数データが有るかチェック
             if($this->drop->checkAddBan(
@@ -167,8 +174,13 @@ class CInotifyProcess {
               }
             }
           }
+
+          // 見つかったのでforeachを抜ける
+          break;
         }
       }
+
+      CAppLog::getInstance()->debug(__CLASS__ . ':' . __FUNCTION__ . " end miliseconds: " . (hrtime(true) - $start) / (1000 * 1000));
     });
     return($subject);
   }

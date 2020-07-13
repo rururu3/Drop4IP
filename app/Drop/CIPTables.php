@@ -133,7 +133,9 @@ class CIPTables {
    * system関数実行
    */
   protected function execute(string $command) : void {
+    $start = hrtime(true);
     CAppLog::getInstance()->debug($command);
     system($command);
+    CAppLog::getInstance()->debug(__CLASS__ . ':' . __FUNCTION__ . " miliseconds: " . (hrtime(true) - $start) / (1000 * 1000));
   }
 }

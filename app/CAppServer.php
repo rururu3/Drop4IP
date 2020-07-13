@@ -95,6 +95,8 @@ class CAppServer {
           echo socket_last_error() . PHP_EOL;
         }
         else {
+          CAppLog::getInstance()->debug($buffer);
+
           if(($json = json_decode($buffer, false)) !== null) {
             switch(strtolower($json->tag ?? '')) {
               case 'addban':

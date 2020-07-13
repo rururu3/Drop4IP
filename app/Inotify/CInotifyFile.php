@@ -119,7 +119,8 @@ class CInotifyFile implements IInotifyEvent {
           $this->disposable = null;
 
           // 監視開始＆ファイルオープン
-          $this->wd = inotify_add_watch($this->fd, $this->fileName, IN_ALL_EVENTS);
+          // $this->wd = inotify_add_watch($this->fd, $this->fileName, IN_ALL_EVENTS);
+          $this->wd = inotify_add_watch($this->fd, $this->fileName, IN_MODIFY | IN_ATTRIB | IN_DELETE_SELF | IN_MOVE_SELF);
           $this->fp = fopen($this->fileName, 'r');
 
           // ファイル読み込み
