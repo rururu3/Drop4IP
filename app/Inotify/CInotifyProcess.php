@@ -153,9 +153,9 @@ class CInotifyProcess {
             if($this->drop->checkAddBan(
               $this->getProcessName(),
               $ipAdder,
-              Carbon::now()->sub(1, 'day')->getTimestamp(),   // TODO: 範囲は後で決める
+              Carbon::now()->sub($this->config->get('filter_period_second'), 'second')->getTimestamp(),
               Carbon::now()->getTimestamp(),
-              10  // TODO:件数@10は後で変える
+              $this->config->get('filter_period_count')
               ) !== false) {
               // バンする
               foreach($this->config->get('protocols') as $protocol) {
@@ -167,7 +167,7 @@ class CInotifyProcess {
                       $protocol,
                       $port,
                       $rule,
-                      Carbon::now()->add(1, 'day')->getTimestamp()    // TODO: 期間は後で変える
+                      Carbon::now()->add($this->config->get('effective_second'), 'second')->getTimestamp()
                     );
                   }
                 }
