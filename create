@@ -1,0 +1,71 @@
+#!/usr/bin/php
+<?php
+$path = __DIR__;
+
+// コマンドライン引数のリストからオプションを取得する
+$longopts = [
+  'dns',
+];
+
+//====================================================================
+// コンフィグファイル作成
+//====================================================================
+$options = getopt('', $longopts);
+$dns = $options['dns'] ?? "sqlite:{$path}/storage/database.sqlite3";
+$appStr = <<< EOM
+dns:
+  {$dns}
+sock:
+  {$path}/storage/drop4ip.sock
+pid:
+  {$path}/storage/drop4ip.pid
+EOM;
+
+// ファイルに書き込み
+if(is_dir("{$path}/config") === false) {
+  mkdir("{$path}/config", 0700);
+}
+file_put_contents("{$path}/config/app.yml", $appStr);
+
+//====================================================================
+// serviceファイル作成
+//====================================================================
+$serviceStr = <<< EOM
+[Unit]
+Description=Drop4IP Service
+After=network.target iptables.service firewalld.service firewalld.service
+
+[Service]
+Type=simple
+ExecStart={$path}/drop4ipc start
+ExecStop={$path}/drop4ipc stop
+ExecReload={$path}/drop4ipc reload
+PIDFile={$path}/storage/drop4ip.pid
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
+EOM;
+
+// ファイルに書き込み
+if(is_dir("{$path}/systemd") === false) {
+  mkdir("{$path}/systemd", 0700);
+}
+file_put_contents("{$path}/systemd/drop4ip.service", $serviceStr);
+
+//====================================================================
+// ログファイル作成
+//====================================================================
+// ファイルに書き込み
+if(is_dir("{$path}/storage") === false) {
+  mkdir("{$path}/storage", 0700);
+}
+if(file_exists("{$path}/storage/ipban.log") === false) {
+  file_put_contents("{$path}/storage/ipban.log", '');
+}
+
+if(preg_match('/sqlite:\s*(.*)$/i', $dns, $m) === 1) {
+  if(file_exists($m[1]) === false) {
+    file_put_contents($m[1], '');
+  }
+}
