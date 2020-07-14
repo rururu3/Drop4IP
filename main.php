@@ -28,7 +28,7 @@ function commandStart(Config $config) {
   $app->initialize();
 
   // シグナルハンドラ関数
-  $callback = function($signo) use ($app) {
+  $callback = function($signo) use ($app, $config) {
     switch ($signo) {
       case SIGTERM:
         // シャットダウンの処理
@@ -45,6 +45,11 @@ function commandStart(Config $config) {
 
     // 破棄
     $app->destroy();
+
+    // プロセスIDが存在したら消す
+    if(file_exists($config->get('pid')) !== false) {
+      unlink($config->get('pid'));
+    }
   };
 
   // シグナル登録
@@ -70,10 +75,6 @@ function commandStop(Config $config) {
     // プロセスIDが存在したら消す
     if(file_exists($config->get('pid')) !== false) {
       unlink($config->get('pid'));
-    }
-    // ソケットファイルがあれば
-    if(file_exists($config->get('sock')) !== false) {
-      unlink($config->get('sock'));
     }
     echo <<< EOM
 ban4ipd stop
