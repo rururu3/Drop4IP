@@ -7,3 +7,6 @@ composer.phar
 
 # storage folder
 /storage/
+
+#nohup
+nohup.out
