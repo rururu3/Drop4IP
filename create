@@ -60,10 +60,10 @@ file_put_contents("{$path}/systemd/drop4ip.service", $serviceStr);
 if(is_dir("{$path}/storage") === false) {
   mkdir("{$path}/storage", 0755);
 }
-if(file_exists("{$path}/storage/ipban.log") === false) {
-  file_put_contents("{$path}/storage/ipban.log", '');
+if(file_exists("{$path}/storage/ban4ip.log") === false) {
+  file_put_contents("{$path}/storage/ban4ip.log", '');
 }
-chmod("{$path}/storage/ipban.log", 0666);
+chmod("{$path}/storage/ban4ip.log", 0666);
 
 if(preg_match('/sqlite:\s*(.*)$/i', $dns, $m) === 1) {
   if(file_exists($m[1]) === false) {
@@ -75,4 +75,4 @@ if(preg_match('/sqlite:\s*(.*)$/i', $dns, $m) === 1) {
 //====================================================================
 // 実行ファイル
 //====================================================================
-chmod("{$path}/drop4ipc", 0755);
+chmod("{$path}/drop4ipd", 0755);

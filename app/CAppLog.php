@@ -33,7 +33,7 @@ class CAppLog {
             ],
           ],
           'params' => [
-            'file' => __DIR__ . '/../storage/ipban.log',
+            'file' => __DIR__ . '/../storage/ban4ip.log',
             'append' => true,
           ],
         ],

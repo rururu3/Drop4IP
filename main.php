@@ -66,7 +66,7 @@ function commandStart(Config $config) {
  */
 function commandStop(Config $config) {
   if(($pid = file_get_contents($config->get('pid'))) !== false) {
-    // ban4ipdプロセスをすべてkillする
+    // drop4ipcプロセスをすべてkillする
     exec('/bin/kill -TERM ' . $pid);
 
     // 少し待ってから
@@ -77,7 +77,7 @@ function commandStop(Config $config) {
       unlink($config->get('pid'));
     }
     echo <<< EOM
-ban4ipd stop
+drop4ipc stop
 
 EOM;
   }
