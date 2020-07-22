@@ -34,11 +34,11 @@ class CInotifyProcess {
   /**
    * constructor
    */
-  public function __construct(CDrop $drop, string $confFileName) {
+  public function __construct(CDrop $drop, Config $config) {
     $this->drop = $drop;
-    $this->config = new Config($confFileName);
+    $this->config = $config;
 
-    foreach($this->config->get('logs') as $fileName) {
+    foreach($this->config->get('watch_log_files') as $fileName) {
       $this->inotifyFileList[] = new CInotifyFile($fileName);
     }
 
@@ -89,7 +89,7 @@ class CInotifyProcess {
    * サービス名取得
    */
   public function getProcessName() : string {
-    return($this->config->get('process'));
+    return($this->config->get('process_name'));
   }
 
   /**

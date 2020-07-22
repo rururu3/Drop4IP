@@ -9,13 +9,13 @@ class CIPTables {
   protected $iptables = "/sbin/iptables";
   protected $ip6tables = "/sbin/ip6tables";
 
-  protected $processList;
+  protected $processNameList;
 
   /**
    * constructor
    */
   public function __construct() {
-    $this->processList = [];
+    $this->processNameList = [];
   }
 
   /**
@@ -27,55 +27,70 @@ class CIPTables {
   /**
    * 初期処理
    */
-  public function initialize(array $processList) : void {
-    $this->processList = $processList;
-
-    // 削除＆再作成
-    foreach($this->processList as $process) {
-      $this->deleteChain($process);
-      $this->addChain($process);
-    }
+  public function initialize() : void {
   }
 
   /**
    * 破棄処理
    */
   public function destroy() : void {
-    foreach($this->processList as $process) {
-      $this->deleteChain($process);
+    $keys = array_keys($this->processNameList);
+    foreach($keys as $processName) {
+      $this->removeProcessName($processName);
     }
+  }
+
+  /**
+   * 処理するプロセス名を追加
+   */
+  public function addProcessName(string $processName) {
+    if(empty($this->processNameList[$processName]) !== false) {
+      $this->deleteChain($processName);
+      $this->addChain($processName);
+      $this->processNameList[$processName] = $processName;
+    }
+  }
+
+  /**
+   * 処理するプロセス名を削除
+   */
+  public function removeProcessName(string $processName) {
+    if(empty($this->processNameList[$processName]) === false) {
+      $this->deleteChain($processName);
+    }
+    unset($this->processNameList[$processName]);
   }
 
   /**
    * チェインを削除する
    */
-  public function deleteChain(string $process) : void {
+  public function deleteChain(string $processName) : void {
     foreach([$this->iptables, $this->ip6tables] as $iptables) {
       // INPUTチェインからチェインを削除
-      $this->execute("{$iptables} -D INPUT -j {$process}");
+      $this->execute("{$iptables} -D INPUT -j {$processName}");
       // チェインを削除
-      $this->execute("{$iptables} -F {$process}");
-      $this->execute("{$iptables} -X {$process}");
+      $this->execute("{$iptables} -F {$processName}");
+      $this->execute("{$iptables} -X {$processName}");
     }
   }
 
   /**
    * チェインを追加するする
    */
-  public function addChain(string $process) : void {
+  public function addChain(string $processName) : void {
     foreach([$this->iptables, $this->ip6tables] as $iptables) {
       // チェインを追加する
-      $this->execute("{$iptables} -N {$process}");
-      $this->execute("{$iptables} -A {$process} -j RETURN");
+      $this->execute("{$iptables} -N {$processName}");
+      $this->execute("{$iptables} -A {$processName} -j RETURN");
       // INPUTチェインにチェインを追加(最初に)
-      $this->execute("{$iptables} -I INPUT -j {$process}");
+      $this->execute("{$iptables} -I INPUT -j {$processName}");
     }
   }
 
   /**
    * 指定情報でiptablesに追加
    */
-  public function addBanIP(string $process, string $source, string $protocol, string $port, string $rule) : void {
+  public function addBanIP(string $processName, string $source, string $protocol, string $port, string $rule) : void {
     $command = "";
     if (filter_var($source, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
       // IPv4処理
@@ -88,10 +103,10 @@ class CIPTables {
 
     if(empty($command) === false) {
       if(strtolower($protocol) === 'all' && strtolower($protocol) === 'all') {
-        $this->execute("{$command} -I {$process} --source {$source} --jump {$rule}");
+        $this->execute("{$command} -I {$processName} --source {$source} --jump {$rule}");
       }
       else {
-        $this->execute("{$command} -I {$process} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
+        $this->execute("{$command} -I {$processName} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
       }
     }
   }
@@ -99,7 +114,7 @@ class CIPTables {
   /**
    * 指定情報でiptablesから削除
    */
-  public function removeBanIP(string $process, string $source, string $protocol, string $port, string $rule) : void {
+  public function removeBanIP(string $processName, string $source, string $protocol, string $port, string $rule) : void {
     $command = "";
     if (filter_var($source, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
       // IPv4処理
@@ -112,10 +127,10 @@ class CIPTables {
 
     if(empty($command) === false) {
       if(strtolower($protocol) === 'all' && strtolower($protocol) === 'all') {
-        $this->execute("{$command} -D {$process} --source {$source} --jump {$rule}");
+        $this->execute("{$command} -D {$processName} --source {$source} --jump {$rule}");
       }
       else {
-        $this->execute("{$command} -D {$process} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
+        $this->execute("{$command} -D {$processName} --source {$source} --proto {$protocol} --dport {$port} --jump {$rule}");
       }
     }
   }

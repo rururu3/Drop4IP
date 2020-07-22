@@ -1,6 +1,6 @@
-process:
+process_name:
   postfix
-logs:
+watch_log_files:
   - /var/log/mail.log
 protocols:
   - all

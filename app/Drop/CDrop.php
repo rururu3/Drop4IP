@@ -16,7 +16,7 @@ class CDrop {
   protected $config;
   protected $database;
   protected $ipTables;
-  protected $processList;
+  protected $processNameList;
 
   protected $disposable;
 
@@ -42,11 +42,9 @@ class CDrop {
   /**
    * 初期処理
    */
-  public function initialize(array $processList) : void {
-    $this->processList = $processList;
-
+  public function initialize() : void {
     $this->database->initialize();
-    $this->iptable->initialize($processList);
+    $this->iptable->initialize();
 
     // キャッシュ削除
     $this->cacheIPTables = [];
@@ -57,12 +55,14 @@ class CDrop {
     // 現在あるデータでバンする
     $list = $this->database->getBanList();
     foreach($list as $v) {
+      $this->addProcessName($v->process_name);
+
       // iptablesに登録
-      if(isset($this->cacheIPTables[$v->source][$v->protocol][$v->port][$v->rule]) === false) {
-        $this->iptable->addBanIP($v->process, $v->source, $v->protocol, $v->port, $v->rule);
+      if(isset($this->cacheIPTables[$v->process_name][$v->source][$v->protocol][$v->port][$v->rule]) === false) {
+        $this->iptable->addBanIP($v->process_name, $v->source, $v->protocol, $v->port, $v->rule);
       }
       // キャッシュに登録
-      $this->cacheIPTables[$v->source][$v->protocol][$v->port][$v->rule] = 1;
+      $this->cacheIPTables[$v->process_name][$v->source][$v->protocol][$v->port][$v->rule] = 1;
     }
 
     // 監視は60秒単位でいいや
@@ -73,7 +73,7 @@ class CDrop {
       $date = Carbon::now()->getTimestamp();
       $list = $this->database->getEffectiveDateOverList($date);
       foreach($list as $v) {
-        $this->removeBan($v->process, $v->source, $v->protocol, $v->port, $v->rule);
+        $this->removeBan($v->process_name, $v->source, $v->protocol, $v->port, $v->rule);
       }
       $this->database->removeEffectiveDateOverList($date);
     });
@@ -90,57 +90,77 @@ class CDrop {
   }
 
   /**
-   * ログに追加する
+   * 処理するプロセス名を追加
    */
-  public function addLogs(string $process, string $source, int $createDate) : void {
-    // ログにデータを追加する
-    $this->database->addLogData($process, $source, $createDate);
+  public function addProcessName(string $processName) {
+    if(empty($this->processNameList[$processName]) !== false) {
+      $this->iptable->addProcessName($processName);
+      $this->processNameList[$processName] = $processName;
+    }
   }
 
-  public function checkAddBan(string $process, string $source, int $fromDate, int $toDate, $needCount) : bool {
+  /**
+   * 処理するプロセス名を削除
+   */
+  public function removeProcessName(string $processName) {
+    if(empty($this->processNameList[$processName]) === false) {
+      $this->iptable->removeProcessName($processName);
+    }
+    unset($this->processNameList[$processName]);
+  }
+
+  /**
+   * ログに追加する
+   */
+  public function addLogs(string $processName, string $source, int $createDate) : void {
+    // ログにデータを追加する
+    $this->database->addLogData($processName, $source, $createDate);
+  }
+
+  public function checkAddBan(string $processName, string $source, int $fromDate, int $toDate, $needCount) : bool {
     // 指定期間でのデータ数を見る
-    $count = $this->database->getLogDataCountBetween($process, $source, $fromDate, $toDate);
+    $count = $this->database->getLogDataCountBetween($processName, $source, $fromDate, $toDate);
     return($count >= $needCount);
   }
 
   /**
    * バンに追加する
    */
-  public function addBan(string $process, string $source, string $protocol, string $port, string $rule, int $effectiveDate) : void {
+  public function addBan(string $processName, string $source, string $protocol, string $port, string $rule, int $effectiveDate) : void {
     // プロセスになければ処理しない
-    if(in_array($process, $this->processList) === false) {
+    if(in_array($processName, $this->processNameList) === false) {
       return;
     }
 
     // キャッシュになかったら処理をする
-    if(isset($this->cacheIPTables[$process][$source][$protocol][$port][$rule]) === false) {
+    if(isset($this->cacheIPTables[$processName][$source][$protocol][$port][$rule]) === false) {
       // 先にDBに登録
-      $this->database->addBanData($process, $source, $protocol, $port, $rule, $effectiveDate);
+      $this->database->addBanData($processName, $source, $protocol, $port, $rule, $effectiveDate);
 
       // iptablesに登録
-      $this->iptable->addBanIP($process, $source, $protocol, $port, $rule);
+      $this->iptable->addBanIP($processName, $source, $protocol, $port, $rule);
 
       // キャッシュに乗せる
-      $this->cacheIPTables[$process][$source][$protocol][$port][$rule] = 1;
+      $this->cacheIPTables[$processName][$source][$protocol][$port][$rule] = 1;
     }
   }
 
   /**
    * バンを削除する
    */
-  public function removeBan(string $process, string $source, string $protocol, string $port, string $rule) : void {
+  public function removeBan(string $processName, string $source, string $protocol, string $port, string $rule) : void {
     // プロセスになければ処理しない
-    if(in_array($process, $this->processList) === false) {
+    if(in_array($processName, $this->processNameList) === false) {
       return;
     }
 
     // 先にDBから削除
-    $this->database->removeBanData($process, $source, $protocol, $port, $rule);
+    $this->database->removeBanData($processName, $source, $protocol, $port, $rule);
 
     // iptablesから削除
-    $this->iptable->removeBanIP($process, $source, $protocol, $port, $rule);
+    $this->iptable->removeBanIP($processName, $source, $protocol, $port, $rule);
 
     // キャッシュから消す
-    unset($this->cacheIPTables[$process][$source][$protocol][$port][$rule]);
+    unset($this->cacheIPTables[$processName][$source][$protocol][$port][$rule]);
   }
 }
