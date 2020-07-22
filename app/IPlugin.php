@@ -14,4 +14,19 @@ interface IPlugin {
    * 破棄処理
    */
   public function destroy() : void;
+
+  /**
+   * ログに追加されたとき
+   */
+  public function addLogs(array $pluginArgv);
+
+  /**
+   * バンに追加されたとき
+   */
+  public function addBan(array $pluginArgv);
+
+  /**
+   * バンを削除されたとき
+   */
+  public function removeBan(array $pluginArgv);
 }

@@ -115,6 +115,13 @@ class CDrop {
   public function addLogs(string $processName, string $source, int $createDate) : void {
     // ログにデータを追加する
     $this->database->addLogData($processName, $source, $createDate);
+
+    // プラグイン処理
+    \App\CApp::getInstance()->executePluginFunction('addLogs', [
+      'process_name' => $processName,
+      'source' => $source,
+      'create_date' => $createDate,
+    ]);
   }
 
   public function checkAddBan(string $processName, string $source, int $fromDate, int $toDate, $needCount) : bool {
@@ -142,6 +149,15 @@ class CDrop {
 
       // キャッシュに乗せる
       $this->cacheIPTables[$processName][$source][$protocol][$port][$rule] = 1;
+
+      // プラグイン処理
+      \App\CApp::getInstance()->executePluginFunction('addBan', [
+        'process_name' => $processName,
+        'source' => $source,
+        'protocol' => $protocol,
+        'port' => $port,
+        'rule' => $rule,
+      ]);
     }
   }
 
@@ -162,5 +178,14 @@ class CDrop {
 
     // キャッシュから消す
     unset($this->cacheIPTables[$processName][$source][$protocol][$port][$rule]);
+
+    // プラグイン処理
+    \App\CApp::getInstance()->executePluginFunction('removeBan', [
+      'process_name' => $processName,
+      'source' => $source,
+      'protocol' => $protocol,
+      'port' => $port,
+      'rule' => $rule,
+    ]);
   }
 }

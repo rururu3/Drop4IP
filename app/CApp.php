@@ -142,6 +142,15 @@ class CApp {
   }
 
   /**
+   * プラグインに処理を実行させる
+   */
+  public function executePluginFunction(string $functionName, array $pluginArgv) {
+    foreach($this->pluginClassNameList as $plugin) {
+      $plugin->{$functionName}($pluginArgv);
+    }
+  }
+
+  /**
    * アプリケーションのルートフォルダを返す
    */
   public function rootPath() : string {
