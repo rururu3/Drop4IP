@@ -1,6 +1,8 @@
 <?php
 namespace App\Plugins;
 
+use App\CAppLog;
+
 // Config周り
 // https://github.com/hassankhan/config
 use Noodlehaus\Config;
@@ -14,28 +16,28 @@ class DummyPlugin implements IPlugin {
    * constructor
    */
   public function __construct() {
-    echo 'Load DummyPlugin' . PHP_EOL;
+    CAppLog::getInstance()->debug('__construct DummyPlugin');
   } 
 
   /**
    * destruct
    */
   public function __destruct() {
-    echo 'UnLoad DummyPlugin' . PHP_EOL;
+    CAppLog::getInstance()->debug('__destruct DummyPlugin');
   }
 
   /**
    * 初期処理
    */
   public function initialize(Config $pluginConfig) : void {
-    echo 'initialize DummyPlugin' . PHP_EOL;
+    CAppLog::getInstance()->debug('initialize DummyPlugin');
   }
 
   /**
    * 破棄処理
    */
   public function destroy() : void {
-    echo 'destroy DummyPlugin' . PHP_EOL;
+    CAppLog::getInstance()->debug('destroy DummyPlugin');
   }
 
 
@@ -43,23 +45,23 @@ class DummyPlugin implements IPlugin {
    * ログに追加されたとき
    */
   public function addLogs(array $pluginArgv) {
-    echo 'addLogs DummyPlugin' . PHP_EOL;
-    var_dump($pluginArgv);
+    CAppLog::getInstance()->debug('addLogs DummyPlugin');
+    CAppLog::getInstance()->debug(print_r($pluginArgv, true));
   }
 
   /**
    * バンに追加されたとき
    */
   public function addBan(array $pluginArgv) {
-    echo 'addBan DummyPlugin' . PHP_EOL;
-    var_dump($pluginArgv);
+    CAppLog::getInstance()->debug('addBan DummyPlugin');
+    CAppLog::getInstance()->debug(print_r($pluginArgv, true));
   }
 
   /**
    * バンを削除されたとき
    */
   public function removeBan(array $pluginArgv) {
-    echo 'removeBan DummyPlugin' . PHP_EOL;
-    var_dump($pluginArgv);
+    CAppLog::getInstance()->debug('removeBan DummyPlugin');
+    CAppLog::getInstance()->debug(print_r($pluginArgv, true));
   }
 }
