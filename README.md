@@ -23,11 +23,9 @@ composer install
 ```
 
 ***
-## ログ
+## 初期設定
 ```
-mkdir storage
-touch storage/ipban.log
-chmod 666 storage/ipban.log
+./create
 ```
 
 ***
