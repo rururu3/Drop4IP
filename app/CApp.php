@@ -20,6 +20,7 @@ class CApp {
   protected $loop;
   
   protected $inotifyProcesseList;
+  protected $pluginClassNameList;
 
   public static function getInstance() : CApp {
     return self::$instance ?? self::$instance = new self();
@@ -34,6 +35,7 @@ class CApp {
     $this->drop = new Drop\CDrop();
 
     $this->inotifyProcesseList = [];
+    $this->pluginClassNameList = [];
   } 
 
   /**
@@ -58,9 +60,15 @@ class CApp {
 
     // configフォルダに有るものを読み込む(アプリ用設定ファイル以外)
     foreach(glob('config/*.yml') as $confFileName){
-      if(preg_match('/(app.yml)/i', $confFileName, $m) === 0) {
+      if(preg_match('/(app.yml|plugin.yml)/i', $confFileName, $m) === 0) {
         $this->addProcessFromConfig(new Config($confFileName));
       }
+    }
+
+    // プラグイン読み込み
+    $pluginConfig = new Config('config/plugin.yml');
+    foreach(glob('app/Plugins/*.php') as $pluginFileName) {
+      $this->addPlugin(basename($pluginFileName, '.php'), $pluginConfig);
     }
   }
 
@@ -73,6 +81,11 @@ class CApp {
     $processNameList = array_keys($this->inotifyProcesseList);
     foreach($processNameList as $processName) {
       $this->removeProcessName($processName);
+    }
+
+    $keys = array_keys($this->pluginClassNameList);
+    foreach($keys as $pluginClassName) {
+      $this->removePlugin($pluginClassName);
     }
     
     $this->drop->destroy();
@@ -105,6 +118,27 @@ class CApp {
       $this->drop->removeProcessName($processName);
     }
     unset($this->inotifyProcesseList[$processName]);
+  }
+
+  /**
+   * プラグイン読み込み
+   */
+  protected function addPlugin(string $pluginClassName, Config $pluginConfig) {
+    if(empty($this->pluginClassNameList[$pluginClassName]) !== false) {
+      $pluginClassName = "App\\Plugins\\{$pluginClassName}";
+      $this->pluginClassNameList[$pluginClassName] = new $pluginClassName();
+      $this->pluginClassNameList[$pluginClassName]->initialize($pluginConfig);
+    }
+  }
+
+  /**
+   * プラグイン削除
+   */
+  protected function removePlugin(string $pluginClassName) {
+    if(empty($this->pluginClassNameList[$pluginClassName]) === false) {
+      $this->pluginClassNameList[$pluginClassName]->destroy();
+    }
+    unset($this->pluginClassNameList[$pluginClassName]);
   }
 
   /**
